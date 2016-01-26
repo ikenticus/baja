@@ -1,0 +1,3 @@
+brew install libcouchbase 
+pip install couchbase
+pip install bottle lxml
