@@ -1,21 +1,75 @@
 from bottle import run, get, post, route, request, template, static_file
 from couchbase.bucket import Bucket
+from couchbase.n1ql import N1QLQuery
 from lxml import etree
 from pprint import pprint
 import os
+import random
 import socket
 import sys
 
-COUCHBASE = 'couchbase://localhost/'
+COUCHBASE = 'couchbase://localhost'
+
+
+@get('/query/word/<type>')
+def get_word_type(type):
+    cb = Bucket(COUCHBASE)
+    # fails if you do not create an index on type
+    #   $ /Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin/cbq
+    #   cbq> CREATE PRIMARY INDEX ON default USING GSI;
+    query = N1QLQuery("SELECT cnt, word, type FROM `default` WHERE type=$q_type", q_type=type)
+    print query
+    for row in cb.n1ql_query(query):
+        print row
 
 @get('/<bucket>/<doc:path>')
 def get_document(bucket, doc):
-    d = { 'which': 'way', 'but': 'down' }
+    cb = Bucket(COUCHBASE + '/default')
     key = '%s_%s' % (bucket, doc.replace('/', '_'))
     #print key
-    cb = Bucket(COUCHBASE + 'default')
-    #cb.upsert(key, d)
-    return cb.get(key).value
+
+    # randomly insert data
+    put_documents(bucket, key)
+
+    #couchbase.bucketmanager
+    #design_create(name, ddoc, use_devmode=True, syncwait=0)
+
+    # get odd views
+    results = cb.query("dev_word", "Odd", limit=5)
+    print results
+    for row in results:
+        print row
+
+    # get exact document
+    data = cb.get(key).value
+    return data
+
+
+def put_documents(bucket, key):
+    cb = Bucket(COUCHBASE + '/default')
+    for cnt in range(10):
+        word = ''.join([chr(random.randint(97,122)) for r in range(0,random.randint(5,10))])
+        if len(word) % 2 == 0:
+            type = 'even'
+        else:
+            type = 'odd'
+        d = { 'type': type, 'word': word, 'cnt': cnt }
+        cb.upsert('%s_%02d' % (key, cnt), d)
+
+
+def create_bucket(bucket):
+    '''
+        http://stackoverflow.com/questions/14513750/how-to-create-a-couchbase-bucket-using-python-client
+    '''
+    couchbase = Couchbase("127.0.0.1:8091", "Administrator", "password")
+    # get the rest interface
+    rest = couchbase._rest()
+    rest.create_bucket(bucket='myBucket',
+                        ramQuotaMB=160,
+                        authType='sasl',
+                        saslPassword='password',
+                        replicaNumber=0,
+                        bucketType='couchbase')
 
 
 '''
