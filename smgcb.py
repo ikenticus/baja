@@ -34,6 +34,8 @@ def get_service(project, service, paths):
         return action(params[1:])
     except ImportError:
         return { 'Error': 1, 'Message': 'Unable to load the %s SERVICE from the %s PROJECT' % (service, project) }
+    except AttributeError:
+        return { 'Error': 1, 'Message': 'Unable to handle %s FIXTURE in the %s SERVICE' % (paths.split('/')[0], service) }
 
 
 #@get('/<bucket>/<doc:path>')
