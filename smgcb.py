@@ -1,4 +1,4 @@
-from bottle import run, get, post, route, request, template, static_file
+from bottle import run, get, post, route, request, response, template, static_file
 from couchbase.bucket import Bucket
 from couchbase.n1ql import N1QLQuery
 from lxml import etree
@@ -22,7 +22,21 @@ def get_word_type(type):
     for row in cb.n1ql_query(query):
         print row
 
-@get('/<bucket>/<doc:path>')
+
+@get('/<project>/<service>.svc/<paths:path>')
+def get_service(project, service, paths):
+    try:
+        params = paths.split('/')
+        fixture = params[0].lower()
+        module = __import__('%s.%s' % (project.lower(), service.lower()))
+        svc = getattr(module, service.lower())
+        action = getattr(svc, fixture)
+        return action(params[1:])
+    except ImportError:
+        return { 'Error': 1, 'Message': 'Unable to load the %s SERVICE from the %s PROJECT' % (service, project) }
+
+
+#@get('/<bucket>/<doc:path>')
 def get_document(bucket, doc):
     cb = Bucket(COUCHBASE + '/default')
     key = '%s_%s' % (bucket, doc.replace('/', '_'))
@@ -72,10 +86,8 @@ def create_bucket(bucket):
                         bucketType='couchbase')
 
 
-'''
-    Main
-'''
-port = 8080
-#host = [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1][0]
-#run(host=host, port=port)
-run(port=port)
+if __name__ == "__main__":
+    port = 8080
+    #host = [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1][0]
+    #run(host=host, port=port)
+    run(port=port)
