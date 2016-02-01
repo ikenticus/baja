@@ -1,3 +1,8 @@
 brew install libcouchbase 
 pip install couchbase
 pip install bottle lxml
+
+
+# N1QL if you do not create an index on type
+$ /Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin/cbq
+cbq> CREATE PRIMARY INDEX ON default USING GSI;
