@@ -23,19 +23,19 @@ def get_word_type(type):
         print row
 
 
-@get('/<project>/<service>.svc/<paths:path>')
-def get_service(project, service, paths):
-    try:
+@route('/<project>/<service>.svc/<paths:path>')
+def route_service(project, service, paths):
+    #try:
         params = paths.split('/')
         fixture = params[0].lower()
         module = __import__('%s.%s' % (project.lower(), service.lower()))
         svc = getattr(module, service.lower())
         action = getattr(svc, fixture)
         return action(params[1:])
-    except ImportError:
-        return { 'Error': 1, 'Message': 'Unable to load the %s SERVICE from the %s PROJECT' % (service, project) }
-    except AttributeError:
-        return { 'Error': 1, 'Message': 'Unable to handle %s FIXTURE in the %s SERVICE' % (paths.split('/')[0], service) }
+    #except ImportError:
+    #    return { 'Error': 1, 'Message': 'Unable to load the %s SERVICE from the %s PROJECT' % (service, project) }
+    #except AttributeError:
+    #    return { 'Error': 1, 'Message': 'Unable to handle %s FIXTURE in the %s SERVICE' % (paths.split('/')[0], service) }
 
 
 #@get('/<bucket>/<doc:path>')
