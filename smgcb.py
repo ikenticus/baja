@@ -10,6 +10,10 @@ import sys
 
 bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 * 10
 
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
 
 @post('/<project>/<service>.svc/<paths:path>')
 def post_service (project, service, paths):
@@ -23,7 +27,7 @@ def post_service (project, service, paths):
     except ImportError:
         return { 'Error': 1, 'Message': 'Unable to load the %s SERVICE from the %s PROJECT' % (service, project) }
     except AttributeError:
-        return { 'Error': 1, 'Message': 'Unable to handle %s FIXTURE in the %s SERVICE' % (paths.split('/')[0], service) }
+        return { 'Error': 2, 'Message': 'Unable to handle %s FIXTURE in the %s SERVICE' % (paths.split('/')[0], service) }
 
 
 

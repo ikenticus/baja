@@ -1,5 +1,5 @@
 from helpers import *
 
 
-def transactions (params=None):
-    return { 'Message': 'Transactions', 'params': params }
+def override (data, params=None):
+    return { 'Message': 'Override', 'params': params[2:] }

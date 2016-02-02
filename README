@@ -1,6 +1,6 @@
 brew install libcouchbase 
 pip install couchbase
-pip install bottle lxml
+pip install bottle lxml jinja2
 
 
 # N1QL if you do not create an index on type
