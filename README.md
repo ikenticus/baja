@@ -17,7 +17,5 @@ pip install bottle lxml jinja2
 
 ## couchbase
 N1QL needs at least one index on the bucket
-
-    `$ /Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin/cbq`
-
-    `cbq> CREATE PRIMARY INDEX ON default USING GSI;`
+    $ /Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/bin/cbq
+    cbq> CREATE PRIMARY INDEX ON default USING GSI;
