@@ -14,7 +14,6 @@ def upsert_document (bucket, key, doc):
     cb.upsert(key, doc)
 
 
-
 def default_templates (params):
     '''
         Default template list: bucket/fixture/sport/league[/event][/team]/key
@@ -31,6 +30,18 @@ def parse_docs (doc, templates):
         if os.path.exists(tplfile):
             template = Template(open(tplfile).read())
             return template.render(doc=doc)
+
+
+def query_sports (params):
+    cb = Bucket(COUCHBASE)
+    where = []
+    for key in params.keys():
+        where.append('%s="%s"' % (key, params[key]))
+    query = N1QLQuery('SELECT * FROM `sports` WHERE ' + ' AND '.join(where))
+    result = []
+    for row in cb.n1ql_query(query):
+        result.append(row)
+    return result
 
 
 #@get('/query/word/<type>')
